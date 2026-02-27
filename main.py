@@ -1,4 +1,3 @@
-Abu, [27.02.2026 14:53]
 import asyncio
 import logging
 import json
