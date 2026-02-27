@@ -1,4 +1,4 @@
-Abu, [27.02.2026 14:10]
+Abu, [27.02.2026 14:53]
 import asyncio
 import logging
 import json
@@ -93,44 +93,34 @@ async def show_rules(message: types.Message):
 async def set_rank(message: types.Message):
     if message.from_user.id != BOSS_ID: return
     if not message.reply_to_message: return
-    
     args = message.text.split()
     rank_val = " ".join(args[1:]) if len(args) > 1 else "1"
     target = message.reply_to_message.from_user
-    
     uid = str(target.id)
     if uid not in user_ranks: user_ranks[uid] = {"name": target.first_name, "rank": rank_val, "warns": 0}
     else: user_ranks[uid]["rank"] = rank_val
-    
     save_ranks(user_ranks)
-    await message.answer(f"✅ {target.first_name} теперь <b>{rank_val}</b>")
+    await message.answer(f"✅ {target.first_name} теперь <b>{rank_val}</b>", parse_mode="HTML")
 
-Abu, [27.02.2026 14:10]
+Abu, [27.02.2026 14:53]
 @dp.message(Command("warn"))
 async def give_warn(message: types.Message):
     if message.from_user.id != BOSS_ID: return
     if not message.reply_to_message: return
-    
     target = message.reply_to_message.from_user
     uid = str(target.id)
-    
-    if uid not in user_ranks:
-        user_ranks[uid] = {"name": target.first_name, "rank": "1", "warns": 0}
-    
+    if uid not in user_ranks: user_ranks[uid] = {"name": target.first_name, "rank": "1", "warns": 0}
     user_ranks[uid]["warns"] += 1
     w_count = user_ranks[uid]["warns"]
     save_ranks(user_ranks)
-    
     msg = f"⚠️ <b>{target.first_name}</b> получил выговор! ({w_count}/3)"
-    if w_count >= 3:
-        msg += "\n❌ <b>ДОСТИГНУТ ЛИМИТ! ИСКЛЮЧИТЬ ИЗ БАНДЫ!</b>"
+    if w_count >= 3: msg += "\n❌ <b>ДОСТИГНУТ ЛИМИТ! ИСКЛЮЧИТЬ ИЗ БАНДЫ!</b>"
     await message.answer(msg, parse_mode="HTML")
 
 @dp.message(Command("unwarn"))
 async def remove_warn(message: types.Message):
     if message.from_user.id != BOSS_ID: return
     if not message.reply_to_message: return
-    
     uid = str(message.reply_to_message.from_user.id)
     if uid in user_ranks and user_ranks[uid]["warns"] > 0:
         user_ranks[uid]["warns"] -= 1
@@ -154,8 +144,7 @@ async def my_profile(message: types.Message):
     if uid in user_ranks:
         d = user_ranks[uid]
         await message.answer(f"👤 <b>Профиль:</b> {d['name']}\n🎖 <b>Ранг:</b> {d['rank']}\n⚠️ <b>Выговоры:</b> {d['warns']}/3", parse_mode="HTML")
-    else:
-        await message.answer("Тебя нет в базе. Обратись к Боссу!")
+    else: await message.answer("Тебя нет в базе. Обратись к Боссу!")
 
 @dp.message(F.text == "🚨 ТРЕВОГА")
 async def alarm(message: types.Message):
