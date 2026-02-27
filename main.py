@@ -31,8 +31,11 @@ def load_ranks():
     if os.path.exists(RANKS_FILE):
         try:
             with open(RANKS_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except: return {}
+                content = f.read()
+                return json.loads(content) if content else {}
+        except Exception as e:
+            print(f"Error loading ranks: {e}")
+            return {}
     return {}
 
 def save_ranks(ranks):
